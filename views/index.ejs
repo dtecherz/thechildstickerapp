@@ -1,372 +1,3 @@
-<!-- <!DOCTYPE html>
-<html lang="en">
-
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Image Upload and PDF Table</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f0f2f5;
-      display: flex;
-      justify-content: center;
-      /* align-items: center; */
-      height: auto;
-      margin: 0;
-      padding: 20px;
-    }
-
-    .container {
-      background-color: #fff;
-      border-radius: 10px;
-      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-      padding: 25px;
-      width: 100%;
-      max-width: 800px;
-    }
-
-    h1 {
-      text-align: center;
-      color: #333;
-      margin-bottom: 25px;
-    }
-
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      margin-bottom: 40px;
-    }
-
-    input[type="file"],
-    input[type="number"] {
-      padding: 12px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      font-size: 16px;
-      transition: border-color 0.3s;
-    }
-
-    select {
-      padding: 12px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      font-size: 16px;
-      transition: border-color 0.3s;
-    }
-
-    input[type="file"]:focus,
-    input[type="number"]:focus {
-      border-color: #007bff;
-      outline: none;
-    }
-
-    button {
-      padding: 12px;
-      border: none;
-      border-radius: 5px;
-      background-color: #007bff;
-      color: #fff;
-      font-size: 16px;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-
-    button:hover {
-      background-color: #0056b3;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    table,
-    th,
-    td {
-      border: 1px solid #ddd;
-    }
-
-    th,
-    td {
-      padding: 15px;
-      text-align: center;
-    }
-
-    th {
-      background-color: #007bff;
-      color: white;
-    }
-
-    td img {
-      width: 50px;
-      height: auto;
-      border-radius: 5px;
-    }
-
-    td a button {
-      background-color: #28a745;
-      padding: 10px 20px;
-      border-radius: 5px;
-      color: white;
-      border: none;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-
-    td a button:hover {
-      background-color: #218838;
-    }
-
-    tr:hover {
-      background-color: #f0f8ff;
-    }
-
-    /* Modal Styles */
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 1;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.5);
-      justify-content: center;
-      align-items: center;
-    }
-
-    .modal-content {
-      background-color: #fff;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-      width: 100%;
-      max-width: 400px;
-      text-align: center;
-    }
-
-    .modal-header {
-      margin-bottom: 20px;
-    }
-
-    .modal input[type="number"] {
-      padding: 12px;
-      width: 100%;
-      margin-bottom: 20px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
-
-    .modal button {
-      width: 100%;
-      padding: 12px;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-
-    .modal button:hover {
-      background-color: #0056b3;
-    }
-
-    .close-modal {
-      background-color: red;
-      margin-top: 10px;
-    }
-
-    .tableParent {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-
-    @media (max-width: 768px) {
-      .container {
-        padding: 15px;
-      }
-
-      th,
-      td {
-        font-size: 14px;
-        padding: 10px;
-      }
-
-      button {
-        padding: 10px;
-      }
-    }
-  </style>
-</head>
-
-<body>
-  <div class="container">
-
-    <h1>Uploaded Images and Download PDF</h1>
-    <div class="tableParent">
-      <button onclick="openModal()">Add order</button>
-      <table>
-        <thead>
-          <tr>
-            <th>Order Name</th>
-            <th>Order Id</th>
-            <th>Product Id</th>
-            <th>Image</th>
-            <th>template</th>
-            <th>Download PDF</th>
-          </tr>
-        </thead>
-        <tbody id="imageTableBody">
-        </tbody>
-      </table>
-    </div>
-
-    <div id="orderModal" class="modal">
-      <div class="modal-content">
-        <h2 class="modal-header">Enter Order ID</h2>
-        <input type="number" id="orderIdInput" placeholder="Enter Order ID">
-        <button onclick="saveOrderId()">Save</button>
-        <button class="close-modal" onclick="closeModal()">Close</button>
-      </div>
-    </div>
-  </div>
-  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-  <script>
-    async function fetchImagesData() {
-      try {
-        const response = await fetch('/saimShopify/getData');
-        const data = await response.json();
-        console.log("data", data);
-
-        // Get the table body element
-        const tableBody = document.getElementById('imageTableBody');
-
-        // Clear any existing table rows
-        tableBody.innerHTML = '';
-
-        // Iterate through the data and generate table rows
-        data.message.forEach((item, index) => {
-          console.log("item", item);
-
-          const row = document.createElement('tr');
-
-          // Create the serial number cell
-          const orderNameCell = document.createElement('td');
-          orderNameCell.textContent = item.orderName;
-          row.appendChild(orderNameCell);
-
-          const orderIdCell = document.createElement('td');
-          orderIdCell.textContent = item.orderId;
-          row.appendChild(orderIdCell);
-
-          const productIdCell = document.createElement('td');
-          productIdCell.textContent = item.productId;
-          row.appendChild(productIdCell);
-
-          // Create the image cell
-          const imageCell = document.createElement('td');
-          const img = document.createElement('img');
-          img.src = item.imageUrl;
-          img.alt = `Image ${index + 1}`;
-          imageCell.appendChild(img);
-          row.appendChild(imageCell);
-
-
-          const templateCell = document.createElement('td');
-          templateCell.textContent = item.template;
-          row.appendChild(templateCell);
-          if (item.processed) {
-            // Create the download button cell
-            const downloadCell = document.createElement('td');
-            const downloadLink = document.createElement('a');
-            downloadLink.href = `/static/files/pdfs/${item.pdf}`;
-            downloadLink.download = '';
-            const button = document.createElement('button');
-            button.textContent = 'Download PDF';
-            downloadLink.appendChild(button);
-            downloadCell.appendChild(downloadLink);
-            row.appendChild(downloadCell);
-          } else {
-            const downloadCell = document.createElement('td');
-            const button = document.createElement('button');
-
-            button.textContent = 'Pending';
-            button.style.backgroundColor = 'grey';  // Set background color to grey
-            button.style.cursor = 'not-allowed';  // Change the cursor to indicate it’s not clickable
-            button.disabled = true;  // Disable the button
-
-            downloadCell.appendChild(button);
-            row.appendChild(downloadCell);
-          }
-
-
-          tableBody.appendChild(row);
-
-        });
-      } catch (error) {
-        console.error('Error fetching image data:', error);
-      }
-    }
-
-    // Call the function to fetch data on page load
-    window.onload = fetchImagesData;
-
-    function openModal() {
-      document.getElementById('orderModal').style.display = 'flex';
-    }
-
-    function closeModal() {
-      document.getElementById('orderModal').style.display = 'none';
-    }
-
-    function saveOrderId() {
-      try{
-const orderId = document.getElementById('orderIdInput').value;
-      console.log("orderId", orderId);
-
-      // Post the orderId to the specified URL using Axios
-      axios.post('/saimShopify/uploadOlderOrders', { orderId: orderId })
-        .then(response => {
-          if (response.data.message) {
-            alert(response.data.message); // Handle success message from API
-          } else {
-            alert('Order ID saved successfully');
-          }
-          closeModal();  // Close the modal on success
-        })
-        .catch(error => {
-          console.error('Error:', error);
-          alert('Failed to save order ID');
-        });
-      }
-      catch(e)
-      {
-        console.log(e);
-        
-      }
-      
-    }
-
-
-  </script>
-
-
-</body>
-
-</html> -->
-
-
-
-
-
-
-
-
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -375,6 +6,8 @@ const orderId = document.getElementById('orderIdInput').value;
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Image Upload and PDF Table</title>
   <style>
+
+
     body {
       font-family: Arial, sans-serif;
       background-color: #f0f2f5;
@@ -385,6 +18,7 @@ const orderId = document.getElementById('orderIdInput').value;
       margin: 0;
       padding: 20px;
     }
+
 
     .container {
       background-color: #fff;
@@ -614,7 +248,150 @@ const orderId = document.getElementById('orderIdInput').value;
 
 
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
   <script>
+    // Function to get authToken from cookies
+    function getAuthTokenFromCookies() {
+      const name = "authToken=";
+      const decodedCookie = decodeURIComponent(document.cookie);
+      console.log("decodedCookie",decodedCookie);
+      
+      const cookiesArray = decodedCookie.split(';');
+      
+      for (let i = 0; i < cookiesArray.length; i++) {
+        let cookie = cookiesArray[i].trim();
+        if (cookie.indexOf(name) === 0) {
+          return cookie.substring(name.length, cookie.length);
+        }
+      }
+      return "";
+    }
+  
+    async function fetchImagesData() {
+      try {
+        const authToken = getAuthTokenFromCookies();
+        console.log("auth token",authToken);
+        
+  
+        const response = await fetch('/saimShopify/getData', {
+          method: 'GET',
+          headers: {
+            'userAuth': `${authToken}` // Add the authToken in the headers
+          }
+        });
+  
+        const data = await response.json();
+        console.log("data", data);
+  
+        // Get the table body element
+        const tableBody = document.getElementById('imageTableBody');
+  
+        // Clear any existing table rows
+        tableBody.innerHTML = '';
+  
+        // Iterate through the data and generate table rows
+        data.message.forEach((item, index) => {
+          // console.log("item", item);
+  
+          const row = document.createElement('tr');
+  
+          const orderNameCell = document.createElement('td');
+          orderNameCell.textContent = item.orderName;
+          row.appendChild(orderNameCell);
+  
+          const orderIdCell = document.createElement('td');
+          orderIdCell.textContent = item.orderId;
+          row.appendChild(orderIdCell);
+  
+          const productIdCell = document.createElement('td');
+          productIdCell.textContent = item.productId;
+          row.appendChild(productIdCell);
+  
+          const imageCell = document.createElement('td');
+          const img = document.createElement('img');
+          img.src = item.imageUrl;
+          img.alt = `Image ${index + 1}`;
+          imageCell.appendChild(img);
+          row.appendChild(imageCell);
+  
+          const templateCell = document.createElement('td');
+          templateCell.textContent = item.template;
+          row.appendChild(templateCell);
+  
+          if (item.processed) {
+            const downloadCell = document.createElement('td');
+            const downloadLink = document.createElement('a');
+            downloadLink.href = `/static/files/pdfs/${item.pdf}`;
+            downloadLink.download = '';
+            const button = document.createElement('button');
+            button.textContent = 'Download PDF';
+            downloadLink.appendChild(button);
+            downloadCell.appendChild(downloadLink);
+            row.appendChild(downloadCell);
+          } else {
+            const downloadCell = document.createElement('td');
+            const button = document.createElement('button');
+            button.textContent = 'Pending';
+            button.style.backgroundColor = 'grey';
+            button.style.cursor = 'not-allowed';
+            button.disabled = true;
+            downloadCell.appendChild(button);
+            row.appendChild(downloadCell);
+          }
+  
+          tableBody.appendChild(row);
+        });
+      } catch (error) {
+        console.error('Error fetching image data:', error);
+      }
+    }
+  
+    // Call the function to fetch data on page load
+    window.onload = fetchImagesData;
+  
+    function openModal() {
+      document.getElementById('orderModal').style.display = 'flex';
+    }
+  
+    function closeModal() {
+      document.getElementById('orderModal').style.display = 'none';
+    }
+  
+    function saveOrderId() {
+      try {
+        const orderId = document.getElementById('orderIdInput').value;
+        console.log("orderId", orderId);
+  
+        const authToken = getAuthTokenFromCookies();
+  
+        // Post the orderId to the specified URL using Axios
+        axios.post('/saimShopify/uploadOlderOrders', { orderId: orderId }, {
+          headers: {
+            'Authorization': `Bearer ${authToken}` // Add the authToken in the headers
+          }
+        })
+        .then(response => {
+          if (response.data.message) {
+            alert(response.data.message);
+          } else {
+            alert('Order ID saved successfully');
+          }
+          fetchImagesData();
+          closeModal();
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('Failed to save order ID');
+        });
+      } catch (e) {
+        console.log(e);
+      }
+    }
+  </script>
+  
+
+
+<!-- <script>
     async function fetchImagesData() {
       try {
         const response = await fetch('/saimShopify/getData');
@@ -732,7 +509,7 @@ const orderId = document.getElementById('orderIdInput').value;
     }
 
 
-  </script>
+  </script> -->
 
 
 </body>

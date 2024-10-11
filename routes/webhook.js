@@ -13,6 +13,8 @@ const upload = multer({ storage: storage });
 const cron = require('node-cron');
 const crypto = require('crypto');
 
+const {decodeUser} = require("../middlewares/decodeUser")
+
 
 // Function to save image and PDF files and return their paths
 
@@ -453,7 +455,7 @@ cron.schedule('*/3 * * * *', () => {
 
 
 
-router.get("/getData", async (req, res) => {
+router.get("/getData",decodeUser, async (req, res) => {
   try {
     const response = await pdfModel.find({})
     return res.status(200).json({ success: true, message: response })
@@ -591,7 +593,7 @@ router.post("/webhook", async (req, res) => {
 })
 
 
-router.post("/uploadOlderOrders", async (req, res) => {
+router.post("/uploadOlderOrders",decodeUser, async (req, res) => {
   try {
     console.log("ccccc");
 
