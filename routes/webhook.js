@@ -447,7 +447,7 @@ cron.schedule('*/3 * * * *', () => {
   // Add your task logic here
 });
 
-// saveData()
+saveData()
 
 
 
@@ -482,7 +482,8 @@ router.get("/getData",decodeUser, async (req, res) => {
 
 
 async function fetchOrder(orderId) {
-  const url = `https://3c87a4ef7872d65a8dbf9c1bd1002eca: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@2fe60e-c5.myshopify.com/admin/api/2024-07/orders/${orderId}.json`
+  // const url = `https://3c87a4ef7872d65a8dbf9c1bd1002eca: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@2fe60e-c5.myshopify.com/admin/api/2024-07/orders/${orderId}.json`
+  const url = `https://${process.env.Api_Key_new_mid_app}:${process.env.Admin_Api_Access_token_new_mid_app}@2fe60e-c5.myshopify.com/admin/api/2024-07/orders/${orderId}.json`
   try {
     const response = await axios.get(url);
     console.log("response", response.data.order.line_items[0].properties);
@@ -496,7 +497,8 @@ async function fetchOrder(orderId) {
 
 
 async function fetchProduct(productId) {
-  const url = `https://3c87a4ef7872d65a8dbf9c1bd1002eca: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@2fe60e-c5.myshopify.com/admin/api/2024-07/products/${productId}.json`
+  // const url = `https://3c87a4ef7872d65a8dbf9c1bd1002eca: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@2fe60e-c5.myshopify.com/admin/api/2024-07/products/${productId}.json`
+  const url = `https://${process.env.Api_Key_new_mid_app}:${process.env.Admin_Api_Access_token_new_mid_app}@2fe60e-c5.myshopify.com/admin/api/2024-07/products/${productId}.json`
   try {
     const response = await axios.get(url);
     console.log("response", response.data);
@@ -510,6 +512,7 @@ async function fetchProduct(productId) {
     throw error;
   }
 }
+
 
 
 const createDuplicateObject = (data, n) => {
