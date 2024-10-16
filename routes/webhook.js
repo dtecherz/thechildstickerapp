@@ -338,8 +338,6 @@ const addImagesToPdf = async (template, imageUrl) => {
 };
 
 
-
-
 router.post("/uploadImage", upload.single("image"), async (req, res) => {
   try {
     if (!req.file) {
@@ -393,9 +391,6 @@ router.post("/uploadImage", upload.single("image"), async (req, res) => {
 
 
 
-
-
-
 const saveData = async () => {
   try {
     const pdfData = await pdfModel.find({ processed: false })
@@ -446,8 +441,6 @@ cron.schedule('*/3 * * * *', () => {
   saveData()
   // Add your task logic here
 });
-
-saveData()
 
 
 
